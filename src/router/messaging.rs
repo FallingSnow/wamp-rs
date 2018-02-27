@@ -1,6 +1,7 @@
 use super::{ConnectionHandler, ConnectionInfo, ConnectionState, WAMP_JSON};
 use ws::{CloseCode, Error as WSError, ErrorKind as WSErrorKind, Handler, Message as WSMessage,
          Request, Response, Result as WSResult, Sender};
+use ws::util::TcpStream;
 use std::sync::{Arc, Mutex};
 
 use std::collections::HashMap;
@@ -12,6 +13,7 @@ use utils::StructMapWriter;
 use std::io::Cursor;
 use messages::{ErrorDetails, ErrorType, Message, Reason};
 use {Dict, Error, ErrorKind, List, WampResult, ID};
+use openssl::ssl::SslStream;
 
 pub fn send_message(info: &Arc<Mutex<ConnectionInfo>>, message: &Message) -> WampResult<()> {
     let info = info.lock().unwrap();
@@ -202,6 +204,11 @@ impl ConnectionHandler {
 }
 
 impl Handler for ConnectionHandler {
+    fn upgrade_ssl_server(&mut self, stream: TcpStream) -> WSResult<SslStream<TcpStream>> {
+        trace!("Upgrading stream to ssl");
+        self.ssl_acceptor.take().unwrap().accept(stream).map_err(From::from)
+    }
+
     fn on_request(&mut self, request: &Request) -> WSResult<Response> {
         info!("New request");
         let mut response = match Response::from_request(request) {

@@ -9,6 +9,7 @@ extern crate rmp;
 extern crate rmp_serde;
 extern crate rand;
 extern crate eventual;
+extern crate openssl;
 
 
 #[macro_use]

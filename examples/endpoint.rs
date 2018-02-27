@@ -33,8 +33,8 @@ fn echo_callback(args: List, kwargs: Dict) -> CallResult<(Option<List>, Option<D
 }
 
 fn main() {
-    env_logger::init().unwrap();
-    let connection = Connection::new("ws://127.0.0.1:8090/ws", "realm1");
+    env_logger::init();
+    let connection = Connection::new("wss://universalis.exchange:8090/ws", "realm1");
     info!("Connecting");
     let mut client = connection.connect().unwrap();
 
